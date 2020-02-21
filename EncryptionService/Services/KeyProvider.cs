@@ -17,7 +17,7 @@ namespace Encryption.Services
 
         public void RotateKey()
         {
-            currentKeyIndex++;
+            currentKeyIndex = ++currentKeyIndex % keys.Length;
         }
     }
 }

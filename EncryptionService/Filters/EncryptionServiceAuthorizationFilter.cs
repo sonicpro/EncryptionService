@@ -1,7 +1,9 @@
 ﻿using Encryption.Interfaces;
 using Encryption.Shared;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Primitives;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -19,7 +21,7 @@ namespace Encryption.Filters
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
             var request = context.HttpContext.Request;
-            var authorization = request.Headers["Authorization"];
+            var authorization = GetTokenFromHeader(request.Headers);
             ObjectResult fallaciousResult = null;
 
             if (string.IsNullOrEmpty(authorization))
@@ -41,7 +43,7 @@ namespace Encryption.Filters
                     StatusCode = (int)HttpStatusCode.Unauthorized
                 };
             }
-            
+
             if (validationResult.Type != AuthResultType.Ok)
             {
                 fallaciousResult = new ObjectResult("Invalid credentials")
@@ -56,5 +58,19 @@ namespace Encryption.Filters
                 return;
             }
         }
+
+        #region Helper methods
+
+        private string GetTokenFromHeader(IHeaderDictionary headers)
+        {
+            var token = string.Empty;
+            if (headers.ContainsKey("Authorization") && headers["Authorization"][0].StartsWith("Bearer "))
+            {
+                token = headers["Authorization"][0].Substring("Bearer ".Length);
+            }
+            return token;
+        }
+
+        #endregion
     }
 }

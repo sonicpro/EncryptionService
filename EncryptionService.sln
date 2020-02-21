@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EncryptionService", "EncryptionService\EncryptionService.csproj", "{2AD40DC0-C366-4828-BCF5-074A8D0165A8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubicAPI", "PubicAPI\PubicAPI.csproj", "{C717AE92-731F-42B0-AFDA-1E3FCBB63C69}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PublicAPI", "PublicAPI\PublicAPI.csproj", "{C717AE92-731F-42B0-AFDA-1E3FCBB63C69}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -9,7 +9,7 @@ namespace Encryption.Controllers
     [ApiController]
     [Route("encryption")]
     [ServiceFilter(typeof(EncryptionServiceAuthorizationFilter))]
-    public class CryptographyController : Controller
+    public class CryptographyController : ControllerBase
     {
         private readonly IEncryptionService encryptionService;
 
