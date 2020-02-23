@@ -32,6 +32,7 @@ namespace Encryption
             services.AddScoped<IEncryptionHelperService, EncryptionHelperService>();
             services.AddSingleton<IKeyProvider, KeyProvider>();
 
+            services.AddResponseCompression();
             services.AddMvc();
             services.AddScoped<ITokenValidator, TokenVaidator>();
             services.AddScoped<EncryptionServiceAuthorizationFilter>();
@@ -78,6 +79,7 @@ namespace Encryption
             }
 
             app.UseStatusCodePages();
+            app.UseResponseCompression();
             app.UseMvc();
         }
     }

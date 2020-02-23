@@ -1,15 +1,18 @@
 ﻿using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using PublicAPI.Interfaces;
-using System;
+using System.IO;
+using System.IO.Compression;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace PublicAPI.Services
 {
     public class EncryptionServerService : IEncryptionServerService
     {
+        private const string EncodingHeader = "br";
         private readonly IAuthorizationServerService authServerService;
         private readonly string encryptionApiBaseUrl;
         private readonly string encryptRouteTemplate;
@@ -43,15 +46,46 @@ namespace PublicAPI.Services
             using (var client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken.Token);
+                client.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue(EncodingHeader));
                 using (HttpContent content = new StringContent(payloadJson))
                 {
                     content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
                     using (var responseMessage = await client.PostAsync(apiUrl, content))
                     {
-                        return await responseMessage.Content.ReadAsStringAsync();
+                        return await ProcessContent(responseMessage.Content);
                     }
                 }
             }
+        }
+
+        private async Task<string> ProcessContent(HttpContent content)
+        {
+            string contentPayload = null;
+
+            if (content.Headers.ContentEncoding.Contains(EncodingHeader))
+            {
+                using (var input = await content.ReadAsStreamAsync())
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        using (var dc = new BrotliStream(input, CompressionMode.Decompress))
+                        {
+                            dc.CopyTo(ms);
+                            ms.Seek(0, SeekOrigin.Begin);
+                            using (var sr = new StreamReader(ms, Encoding.UTF8))
+                            {
+                                contentPayload = await sr.ReadToEndAsync();
+                            }
+                        }
+                    }
+                }
+                
+            }
+            else
+            {
+                contentPayload = await content.ReadAsStringAsync();
+            }
+            return contentPayload;
         }
 
         #endregion
